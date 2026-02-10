@@ -10,22 +10,16 @@ log() {
     echo -e "\033[0;32m[$(date +'%H:%M:%S')] $1\033[0m" | tee -a "$LOG_FILE"
 }
 
-# --- Base Installation ---
-log "Running pacstrap foundation..."
-PKGS=(base linux linux-firmware sudo networkmanager base-devel git hyprland waybar kitty rofi-wayland sddm pipewire wireplumber firefox ttf-font-awesome noto-fonts-emoji)
-
-# Check if pacstrap is already done by looking for bash in /mnt (which is / inside chroot)
-if [ ! -f "/bin/bash" ]; then
-    # Since we are INSIDE chroot, we use pacman for package idempotency
-    pacman -Syu --noconfirm "${PKGS[@]}"
-else
-    log "System foundation detected. Checking for missing packages..."
-    for pkg in "${PKGS[@]}"; do
-        if ! pacman -Qi "$pkg" &>/dev/null; then
-            pacman -S --noconfirm "$pkg"
-        fi
-    done
-fi
+# --- Base Check ---
+log "Verifying system packages..."
+# Ensure critical packages are there just in case
+PKGS=(base sudo networkmanager hyprland sddm)
+for pkg in "${PKGS[@]}"; do
+    if ! pacman -Qi "$pkg" &>/dev/null; then
+        log "Installing missing package: $pkg..."
+        pacman -S --noconfirm "$pkg"
+    fi
+done
 
 # --- Configuration ---
 log "Configuring Timezone, Locale, Hostname..."

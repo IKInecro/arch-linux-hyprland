@@ -76,8 +76,18 @@ mkdir -p /mnt/root/scripts
 cp -r scripts/* /mnt/root/scripts/
 chmod +x /mnt/root/scripts/*.sh
 
-# --- 6. Execution Chain ---
-log "Starting System Installation (Step 1/3)..."
+# --- 6. Base Installation (Host Side) ---
+log "Installing foundational packages (pacstrap)..."
+BASE_PKGS=(base linux linux-firmware sudo networkmanager base-devel git hyprland waybar kitty rofi-wayland sddm pipewire wireplumber firefox ttf-font-awesome noto-fonts-emoji)
+
+if [ ! -f "/mnt/bin/bash" ]; then
+    pacstrap -K /mnt "${BASE_PKGS[@]}"
+else
+    log "Base system detected. Skipping pacstrap."
+fi
+
+# --- 7. Execution Chain ---
+log "Starting System Configuration (Step 1/3)..."
 arch-chroot /mnt /root/scripts/system-install.sh
 
 log "Starting Bootloader Installation (Step 2/3)..."
