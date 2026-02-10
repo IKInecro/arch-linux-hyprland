@@ -47,9 +47,11 @@ else
 fi
 
 log "Configuring Sudo..."
+mkdir -p /etc/sudoers.d
 if [ ! -f /etc/sudoers.d/wheel ]; then
     echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/wheel
 fi
+chmod 440 /etc/sudoers.d/wheel
 
 # --- Bootloader (GRUB UEFI) ---
 log "Setting up Bootloader (GRUB)..."
@@ -89,7 +91,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # --- Package Installation ---
 log "Installing System Packages..."
 PACKAGES=(
-    base-devel git networkmanager hyprland waybar kitty rofi-wayland
+    base-devel git sudo networkmanager hyprland waybar kitty rofi-wayland
     dolphin sddm pipewire pipewire-pulse wireplumber wl-clipboard
     grim slurp fastfetch xdg-desktop-portal-hyprland neovim curl wget
     firefox ttf-font-awesome noto-fonts-emoji
